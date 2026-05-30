@@ -10,5 +10,6 @@ export const auth = betterAuth({
   }),
   emailAndPassword: {
     enabled: true,
+    autoSignIn: true, // Automatically sign in the user after registration
   },
 });
