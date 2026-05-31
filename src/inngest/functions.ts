@@ -15,6 +15,10 @@ export const queryExecute = inngest.createFunction(
       model: google("gemini-2.5-flash"),
       system: "You are a helpful assistant.",
       prompt: "What is India?",
+      experimental_telemetry: {
+        isEnabled: true,
+        functionId: "generate-poem-agent", // Appears as the span identifier in Sentry
+      },
     });
 
     return steps;
