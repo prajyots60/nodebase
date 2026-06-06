@@ -30,6 +30,8 @@ export const HttpRequestNode = memo((props: NodeProps<HttpRequestNodeType>) => {
   //     refreshToken: fetchHttpRequestRealtimeToken,
   //   });
 
+  const nodeStatus = "error";
+
   const handleOpenSettings = () => setDialogOpen(true);
 
   const nodeData = props.data;
@@ -49,7 +51,7 @@ export const HttpRequestNode = memo((props: NodeProps<HttpRequestNodeType>) => {
         id={props.id}
         icon={GlobeIcon}
         name="HTTP Request"
-        // status={nodeStatus}
+        status={nodeStatus}
         description={description}
         onSettings={handleOpenSettings}
         onDoubleClick={handleOpenSettings}

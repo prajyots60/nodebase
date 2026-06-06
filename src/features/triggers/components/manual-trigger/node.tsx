@@ -17,6 +17,8 @@ export const ManualTriggerNode = memo((props: NodeProps) => {
   //     refreshToken: fetchManualTriggerRealtimeToken,
   //   });
 
+  const nodeStatus = "error";
+
   const handleOpenSettings = () => setDialogOpen(true);
 
   return (
@@ -26,7 +28,7 @@ export const ManualTriggerNode = memo((props: NodeProps) => {
         {...props}
         icon={MousePointerIcon}
         name="When clicking 'Execute workflow'"
-        // status={nodeStatus}
+        status={nodeStatus}
         onSettings={handleOpenSettings}
         onDoubleClick={handleOpenSettings}
       />

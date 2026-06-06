@@ -22,6 +22,8 @@ import { useSuspenseWorkflow } from "@/features/workflows/hooks/use-workflows";
 import "@xyflow/react/dist/style.css";
 import { nodeComponents } from "@/config/node-components";
 import { AddNodeButton } from "./add-node-button";
+import { editorAtom } from "../store/atoms";
+import { useSetAtom } from "jotai";
 
 export const EditorLoading = () => {
   return <LoadingView message="Loading editor..." />;
@@ -36,6 +38,8 @@ export const Editor = ({ workflowId }: { workflowId: string }) => {
 
   const [nodes, setNodes] = useState<Node[]>(workflow.nodes);
   const [edges, setEdges] = useState<Edge[]>(workflow.edges);
+
+  const setEditor = useSetAtom(editorAtom);
 
   const onNodesChange = useCallback(
     (changes: NodeChange[]) =>
@@ -69,6 +73,7 @@ export const Editor = ({ workflowId }: { workflowId: string }) => {
         panOnDrag={false}
         selectionOnDrag
         proOptions={{ hideAttribution: true }}
+        onInit={setEditor}
       >
         <Background />
         <MiniMap />

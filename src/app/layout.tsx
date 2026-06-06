@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Provider } from "jotai";
 import "./globals.css";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { TRPCReactProvider } from "@/trpc/client";
@@ -34,8 +35,10 @@ export default function RootLayout({
         <TooltipProvider>
           <TRPCReactProvider>
             <NuqsAdapter>
-              {children}
-              <Toaster />
+              <Provider>
+                {children}
+                <Toaster />
+              </Provider>
             </NuqsAdapter>
           </TRPCReactProvider>
         </TooltipProvider>
