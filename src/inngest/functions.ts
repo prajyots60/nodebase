@@ -1,26 +1,31 @@
 // src/inngest/functions.ts
+import prisma from "@/lib/db";
 import { inngest } from "./client";
 
-import { createGoogleGenerativeAI } from "@ai-sdk/google";
-// import { google } from '@ai-sdk/google';
-import { generateText } from "ai";
+import { NonRetriableError } from "inngest";
 
-const google = createGoogleGenerativeAI();
-
-export const queryExecute = inngest.createFunction(
-  { id: "query-execute", triggers: { event: "query.execute" } },
+export const executeWorkflow = inngest.createFunction(
+  { id: "execute-workflow", triggers: { event: "workflows/execute.workflow" } },
   async ({ event, step }) => {
-    await step.sleep("pretend-sleep", 5000);
-    const { steps } = await step.ai.wrap("gemini-generate-text", generateText, {
-      model: google("gemini-2.5-flash"),
-      system: "You are a helpful assistant.",
-      prompt: "What is India?",
-      experimental_telemetry: {
-        isEnabled: true,
-        functionId: "generate-poem-agent", // Appears as the span identifier in Sentry
-      },
+    const inngestEventId = event.id;
+    const workflowId = event.data.workflowId;
+
+    if (!inngestEventId || !workflowId) {
+      throw new NonRetriableError("Event ID or workflow ID is missing");
+    }
+
+    const nodes = await step.run("prepare-workflow", async () => {
+      const workflow = await prisma.workflow.findUniqueOrThrow({
+        where: { id: workflowId },
+        include: {
+          nodes: true,
+          connections: true,
+        },
+      });
+
+      return workflow.nodes;
     });
 
-    return steps;
+    return { nodes };
   },
 );
