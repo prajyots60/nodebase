@@ -57,22 +57,49 @@ export const httpRequestExecutor: NodeExecutor<HttpRequestData> = async ({
     throw new NonRetriableError("HTTP Request node: Method not configured");
   }
 
+  let endpoint: string;
+  try {
+    const template = Handlebars.compile(data.endpoint!);
+    endpoint = template(context);
+    if (!endpoint || typeof endpoint !== "string") {
+      throw new Error(
+        "Endpoint template must resolve to a non-empty string",
+      );
+    }
+  } catch (error) {
+    await publish("publish-error-status", httpRequestChannel.status, {
+      nodeId,
+      status: "error",
+    });
+    throw new NonRetriableError(
+      `Http request node failed to resolve endpoint template : ${error}`,
+    );
+  }
+
+  const method = data.method!;
+  const options: KyOptions = { method };
+
+  if (["POST", "PUT", "PATCH"].includes(method)) {
+    try {
+      const resolved = Handlebars.compile(data.body || "{}")(context);
+      JSON.parse(resolved);
+      options.body = resolved;
+      options.headers = {
+        "Content-Type": "application/json",
+      };
+    } catch (error) {
+      await publish("publish-error-status", httpRequestChannel.status, {
+        nodeId,
+        status: "error",
+      });
+      throw new NonRetriableError(
+        `Http request node failed to parse body JSON: ${error}`,
+      );
+    }
+  }
+
   try {
     const result = await step.run("http-request", async () => {
-      const endpoint = Handlebars.compile(data.endpoint!)(context);
-      const method = data.method!;
-
-      const options: KyOptions = { method };
-
-      if (["POST", "PUT", "PATCH"].includes(method)) {
-        const resolved = Handlebars.compile(data.body || "{}")(context);
-        JSON.parse(resolved);
-        options.body = resolved;
-        options.headers = {
-          "Content-Type": "application/json",
-        };
-      }
-
       const response = await ky(endpoint, options);
       const contentType = response.headers.get("content-type");
       const responseData = contentType?.includes("application/json")

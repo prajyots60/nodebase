@@ -1,14 +1,29 @@
 // src/inngest/functions.ts
 import prisma from "@/lib/db";
 import { inngest } from "./client";
-
 import { NonRetriableError } from "inngest";
 import { topologicalSort } from "./utils";
 import { getExecutor } from "@/features/executions/lib/executor-registry";
-import { NodeType } from "@/generated/prisma/enums";
+import { ExecutionStatus, NodeType } from "@/generated/prisma/enums";
 
 export const executeWorkflow = inngest.createFunction(
-  { id: "execute-workflow", triggers: { event: "workflows/execute.workflow" } },
+  {
+    id: "execute-workflow",
+    retries: process.env.NODE_ENV === "production" ? 3 : 0,
+    onFailure: async ({ event, step }) => {
+      return prisma.execution.update({
+        where: { inngestEventId: event.data.event.id },
+        data: {
+          status: ExecutionStatus.FAILED,
+          error: event.data.error.message,
+          errorStack: event.data.error.stack,
+        },
+      });
+    },
+    triggers: {
+      event: "workflows/execute.workflow",
+    },
+  },
   async ({ event, step }) => {
     const inngestEventId = event.id;
     const workflowId = event.data.workflowId;
