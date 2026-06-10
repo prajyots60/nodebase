@@ -9,6 +9,7 @@
     "lint": "biome check",
     "format": "biome format --write",
     "inngest:dev": "inngest-cli dev",
+    "ngrok:dev": "ngrok http --url=paranormal-homomorphic-boyce.ngrok-free.dev 3000",
     "dev:all": "mprocs"
   },
   "overrides": {
