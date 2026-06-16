@@ -29,6 +29,8 @@ import { useForm, Controller } from "react-hook-form";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import { useCredentialsByType } from "@/features/credentials/hooks/use-credentials";
+import { NodeType } from "@/generated/prisma/enums";
 
 const formSchema = z.object({
   variableName: z
@@ -52,24 +54,15 @@ interface Props {
   defaultValues?: Partial<GeminiFormValues>;
 }
 
-//dummy credentials while testing
-const credentials = [
-  {
-    id: "1",
-    name: "Gemini 1",
-  },
-  {
-    id: "2",
-    name: "Gemini 2",
-  },
-];
-
 export const GeminiDialog = ({
   open,
   onOpenChange,
   onSubmit,
   defaultValues = {},
 }: Props) => {
+  const { data: credentials, isLoading: isLoadingCredentials } =
+    useCredentialsByType(NodeType.GEMINI);
+
   const form = useForm<GeminiFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -134,7 +127,11 @@ export const GeminiDialog = ({
             render={({ field, fieldState }) => (
               <Field data-invalid={!!fieldState.error}>
                 <FieldLabel>Gemini Credential</FieldLabel>
-                <Select onValueChange={field.onChange} value={field.value}>
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value}
+                  disabled={isLoadingCredentials || !credentials?.length}
+                >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select a credential" />
                   </SelectTrigger>

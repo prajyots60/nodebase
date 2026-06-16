@@ -4,6 +4,8 @@ import { generateText } from "ai";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import type { NodeExecutor } from "@/features/executions/types";
 import { geminiChannel } from "@/inngest/channels/gemini";
+import prisma from "@/lib/db";
+import { CredentialType } from "@/generated/prisma/enums";
 
 Handlebars.registerHelper("json", (context) => {
   const jsonString = JSON.stringify(context, null, 2);
@@ -32,15 +34,13 @@ export const geminiExecutor: NodeExecutor<GeminiData> = async ({
     status: "loading",
   });
 
-  // Validate before step.run — step tools (publish) can't be called inside another step
-  // Temporarily bypass credential validation for testing
-  // if (!data.credentialId) {
-  //   await publish("publish-error-status", geminiChannel.status, {
-  //     nodeId,
-  //     status: "error",
-  //   });
-  //   throw new NonRetriableError("Gemini node: No credential configured");
-  // }
+  if (!data.credentialId) {
+    await publish("publish-error-status", geminiChannel.status, {
+      nodeId,
+      status: "error",
+    });
+    throw new NonRetriableError("Gemini node: No credential configured");
+  }
 
   if (!data.variableName) {
     await publish("publish-error-status", geminiChannel.status, {
@@ -63,10 +63,32 @@ export const geminiExecutor: NodeExecutor<GeminiData> = async ({
     : "You are a helpful assistant.";
   const userPrompt = Handlebars.compile(data.userPrompt)(context);
 
-  const credentialValue = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+  const credential = await step.run("get-credential", () => {
+    return prisma.credential.findUnique({
+      where: { id: data.credentialId, userId },
+    });
+  });
+
+  if (!credential) {
+    await publish("publish-error-status", geminiChannel.status, {
+      nodeId,
+      status: "error",
+    });
+    throw new NonRetriableError("Gemini node: Credential not found");
+  }
+
+  if (credential.type !== CredentialType.GEMINI) {
+    await publish("publish-error-status", geminiChannel.status, {
+      nodeId,
+      status: "error",
+    });
+    throw new NonRetriableError(
+      "Gemini node: Credential is not of type Gemini",
+    );
+  }
 
   const google = createGoogleGenerativeAI({
-    apiKey: credentialValue,
+    apiKey: credential.value,
   });
 
   try {

@@ -29,6 +29,8 @@ import { useForm, Controller } from "react-hook-form";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import { useCredentialsByType } from "@/features/credentials/hooks/use-credentials";
+import { NodeType } from "@/generated/prisma/enums";
 
 const formSchema = z.object({
   variableName: z
@@ -52,24 +54,15 @@ interface Props {
   defaultValues?: Partial<OpenAiFormValues>;
 }
 
-//dummy credentials while testing
-const credentials = [
-  {
-    id: "1",
-    name: "OpenAI 1",
-  },
-  {
-    id: "2",
-    name: "OpenAI 2",
-  },
-];
-
 export const OpenAiDialog = ({
   open,
   onOpenChange,
   onSubmit,
   defaultValues = {},
 }: Props) => {
+  const { data: credentials, isLoading: isLoadingCredentials } =
+    useCredentialsByType(NodeType.OPENAI);
+
   const form = useForm<OpenAiFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -134,7 +127,11 @@ export const OpenAiDialog = ({
             render={({ field, fieldState }) => (
               <Field data-invalid={!!fieldState.error}>
                 <FieldLabel>OpenAI Credential</FieldLabel>
-                <Select onValueChange={field.onChange} value={field.value}>
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value}
+                  disabled={isLoadingCredentials || !credentials?.length}
+                >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select a credential" />
                   </SelectTrigger>

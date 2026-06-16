@@ -4,6 +4,8 @@ import { generateText } from "ai";
 import { createOpenAI } from "@ai-sdk/openai";
 import type { NodeExecutor } from "@/features/executions/types";
 import { openaiChannel } from "@/inngest/channels/openai";
+import prisma from "@/lib/db";
+import { NodeType } from "@/generated/prisma/enums";
 
 Handlebars.registerHelper("json", (context) => {
   const jsonString = JSON.stringify(context, null, 2);
@@ -32,15 +34,13 @@ export const openAiExecutor: NodeExecutor<OpenAiData> = async ({
     status: "loading",
   });
 
-  // Validate before step.run — step tools (publish) can't be called inside another step
-  // Temporarily bypass credential validation for testing
-  // if (!data.credentialId) {
-  //   await publish("publish-error-status", openaiChannel.status, {
-  //     nodeId,
-  //     status: "error",
-  //   });
-  //   throw new NonRetriableError("OpenAi node: No credential configured");
-  // }
+  if (!data.credentialId) {
+    await publish("publish-error-status", openaiChannel.status, {
+      nodeId,
+      status: "error",
+    });
+    throw new NonRetriableError("OpenAi node: No credential configured");
+  }
 
   if (!data.variableName) {
     await publish("publish-error-status", openaiChannel.status, {
@@ -63,12 +63,30 @@ export const openAiExecutor: NodeExecutor<OpenAiData> = async ({
     : "You are a helpful assistant.";
   const userPrompt = Handlebars.compile(data.userPrompt)(context);
 
-  //TODO
+  const credential = await step.run("get-credential", () => {
+    return prisma.credential.findUnique({
+      where: { id: data.credentialId, userId },
+    });
+  });
 
-  const credentialValue = process.env.OPENAI_API_KEY;
+  if (!credential) {
+    await publish("publish-error-status", openaiChannel.status, {
+      nodeId,
+      status: "error",
+    });
+    throw new NonRetriableError("OpenAi node: Credential not found");
+  }
+
+  if (credential.type !== NodeType.OPENAI) {
+    await publish("publish-error-status", openaiChannel.status, {
+      nodeId,
+      status: "error",
+    });
+    throw new NonRetriableError("OpenAi node: Invalid credential");
+  }
 
   const openai = createOpenAI({
-    apiKey: credentialValue,
+    apiKey: credential.value,
   });
 
   try {

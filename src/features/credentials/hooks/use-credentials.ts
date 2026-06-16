@@ -59,6 +59,9 @@ export const useRemoveCredential = () => {
           trpc.credentials.getOne.queryFilter({ id: data.id }),
         );
       },
+      onError: (error) => {
+        toast.error(`Failed to remove credential: ${error.message}`);
+      },
     }),
   );
 };
