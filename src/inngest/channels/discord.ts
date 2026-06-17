@@ -1,10 +1,10 @@
 import { realtime } from "inngest";
 import { z } from "zod";
 
-export const OPENAI_CHANNEL_NAME = "openai-execution";
+export const DISCORD_CHANNEL_NAME = "discord-execution";
 
-export const openaiChannel = realtime.channel({
-  name: OPENAI_CHANNEL_NAME,
+export const discordChannel = realtime.channel({
+  name: DISCORD_CHANNEL_NAME,
   topics: {
     status: {
       schema: z.object({

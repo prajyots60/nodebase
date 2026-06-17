@@ -6,7 +6,7 @@ import { stripeTriggerExecutor } from "@/features/triggers/components/stripe-tri
 import { geminiExecutor } from "../components/gemini/executor";
 import { openAiExecutor } from "../components/openai/executor";
 import { anthropicExecutor } from "../components/anthropic/executor";
-// import { discordExecutor } from "../components/discord/executor";
+import { discordExecutor } from "../components/discord/executor";
 // import { slackExecutor } from "../components/slack/executor";
 import { NodeType } from "@/generated/prisma/enums";
 
@@ -19,7 +19,7 @@ export const executorRegistry: Partial<Record<NodeType, NodeExecutor>> = {
   [NodeType.GEMINI]: geminiExecutor,
   [NodeType.ANTHROPIC]: anthropicExecutor,
   [NodeType.OPENAI]: openAiExecutor,
-  // [NodeType.DISCORD]: discordExecutor,
+  [NodeType.DISCORD]: discordExecutor,
   // [NodeType.SLACK]: slackExecutor,
 };
 

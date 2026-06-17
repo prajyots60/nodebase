@@ -1,7 +1,7 @@
 import { realtime } from "inngest";
 import { z } from "zod";
 
-export const ANTHROPIC_CHANNEL_NAME = "anthropic-generation";
+export const ANTHROPIC_CHANNEL_NAME = "anthropic-execution";
 
 export const anthropicChannel = realtime.channel({
   name: ANTHROPIC_CHANNEL_NAME,

@@ -1,7 +1,7 @@
 import { realtime } from "inngest";
 import { z } from "zod";
 
-export const GEMINI_CHANNEL_NAME = "gemini-generation";
+export const GEMINI_CHANNEL_NAME = "gemini-execution";
 
 export const geminiChannel = realtime.channel({
   name: GEMINI_CHANNEL_NAME,
