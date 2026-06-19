@@ -18,20 +18,25 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_APP_URL || "https://nodebase.originly.dev",
+  ),
   title: "Nodebase | Automate Your Workflows",
-  description: "Nodebase is the ultimate workflow automation platform to connect your apps and automate your business processes.",
+  description:
+    "Nodebase is the ultimate workflow automation platform to connect your apps and automate your business processes.",
   icons: {
     icon: [
       {
         url: "/logos/logo.svg",
         href: "/logos/logo.svg",
-      }
-    ]
+      },
+    ],
   },
   openGraph: {
     title: "Nodebase | Automate Your Workflows",
-    description: "The ultimate workflow automation platform to connect your apps and automate your business processes.",
-    url: "https://nodebase.com",
+    description:
+      "The ultimate workflow automation platform to connect your apps and automate your business processes.",
+    url: "https://nodebase.originly.dev",
     siteName: "Nodebase",
     images: [
       {
@@ -39,7 +44,7 @@ export const metadata: Metadata = {
         width: 800,
         height: 600,
         alt: "Nodebase Logo",
-      }
+      },
     ],
     locale: "en_US",
     type: "website",
