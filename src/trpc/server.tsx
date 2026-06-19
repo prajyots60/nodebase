@@ -22,13 +22,7 @@ export const trpc = createTRPCOptionsProxy({
 // ...
 export const caller = appRouter.createCaller(createTRPCContext);
 
-// If your router is on a separate server, pass a client:
-createTRPCOptionsProxy<AppRouter>({
-  client: createTRPCClient<AppRouter>({
-    links: [httpLink({ url: "..." })],
-  }),
-  queryClient: getQueryClient,
-});
+
 
 export function prefetch<T extends ReturnType<TRPCQueryOptions<any>>>(
   queryOptions: T,
