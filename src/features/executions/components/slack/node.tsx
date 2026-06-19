@@ -8,7 +8,7 @@ import { SlackDialog, SlackFormValues } from "./dialog";
 import { useNodeStatus } from "../../hooks/use-node-status";
 
 import { fetchSlackRealtimeToken } from "./actions";
-import { SLACK_CHANNEL_NAME } from "@/inngest/channels/slack";
+
 
 type SlackNodeData = {
   webhookUrl?: string;
@@ -23,7 +23,7 @@ export const SlackNode = memo((props: NodeProps<SlackNodeType>) => {
 
   const nodeStatus = useNodeStatus({
     nodeId: props.id,
-    channel: SLACK_CHANNEL_NAME,
+    channel: "slack-execution",
     topic: "status",
     refreshToken: fetchSlackRealtimeToken,
   });

@@ -8,7 +8,7 @@ import { DiscordDialog, DiscordFormValues } from "./dialog";
 import { useNodeStatus } from "../../hooks/use-node-status";
 
 import { fetchDiscordRealtimeToken } from "./actions";
-import { DISCORD_CHANNEL_NAME } from "@/inngest/channels/discord";
+
 
 type DiscordNodeData = {
   webhookUrl?: string;
@@ -23,7 +23,7 @@ export const DiscordNode = memo((props: NodeProps<DiscordNodeType>) => {
 
   const nodeStatus = useNodeStatus({
     nodeId: props.id,
-    channel: DISCORD_CHANNEL_NAME,
+    channel: "discord-execution",
     topic: "status",
     refreshToken: fetchDiscordRealtimeToken,
   });
