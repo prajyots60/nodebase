@@ -1,4 +1,6 @@
 import { ArrowRight, Workflow } from "lucide-react";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 import Link from "next/link";
 import { FeatureGrid } from "@/components/marketing/feature-grid";
 import { HeroDemoSection } from "@/components/marketing/hero-demo-section";
@@ -8,7 +10,8 @@ import { WorkflowDemo } from "@/components/marketing/workflow-demo";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const session = await auth.api.getSession({ headers: await headers() });
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* ──────────────── Navigation ──────────────── */}
@@ -54,15 +57,17 @@ export default function LandingPage() {
           </nav>
 
           <div className="flex items-center gap-3">
-            <Link
-              href="/login"
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors hidden sm:block"
-            >
-              Sign in
-            </Link>
-            <Link href="/workflows">
+            {!session && (
+              <Link
+                href="/login"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors hidden sm:block"
+              >
+                Sign in
+              </Link>
+            )}
+            <Link href={session ? "/workflows" : "/login"}>
               <Button size="sm" className="rounded-lg text-xs h-8 px-4">
-                Start Building
+                {session ? "Go to App" : "Start Building"}
                 <ArrowRight className="size-3 ml-1.5" />
               </Button>
             </Link>
@@ -99,12 +104,12 @@ export default function LandingPage() {
             </p>
 
             <div className="flex flex-wrap items-center gap-3 mb-16">
-              <Link href="/workflows">
+              <Link href={session ? "/workflows" : "/login"}>
                 <Button
                   size="lg"
                   className="rounded-lg h-11 px-6 text-sm shadow-lg shadow-primary/15"
                 >
-                  Start Building Free
+                  {session ? "Go to App" : "Start Building Free"}
                   <ArrowRight className="size-4 ml-2" />
                 </Button>
               </Link>
@@ -196,12 +201,12 @@ export default function LandingPage() {
               Start building durable, AI-powered automations today.
             </p>
             <div className="flex flex-wrap justify-center gap-3">
-              <Link href="/workflows">
+              <Link href={session ? "/workflows" : "/login"}>
                 <Button
                   size="lg"
                   className="rounded-lg h-12 px-8 text-base shadow-lg shadow-primary/15"
                 >
-                  Start Building Free
+                  {session ? "Go to App" : "Start Building Free"}
                   <ArrowRight className="size-4 ml-2" />
                 </Button>
               </Link>
