@@ -20,6 +20,23 @@ export const auth = betterAuth({
     enabled: true,
     autoSignIn: true, // Automatically sign in the user after registration
   },
+  socialProviders: {
+    github: {
+      clientId: process.env.GITHUB_CLIENT_ID as string,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
+    },
+    google: {
+      clientId: process.env.GOOGLE_CLIENT_ID as string,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+    },
+  },
+  account: {
+    accountLinking: {
+      enabled: true,
+      trustedProviders: ["google", "github"], // add your trusted providers
+      allowDifferentEmails: false, // Set to true if you want to support non-matching emails
+    },
+  },
 
   plugins: [
     polar({
