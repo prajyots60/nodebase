@@ -15,9 +15,11 @@
 
 <br />
 
-<div align="center">
-  <video src="public/logos/demo.mp4" width="100%" autoplay loop muted playsinline></video>
-</div>
+
+  <p align="center">
+  <img src="./public/demo.gif" alt="Nodebase Demo" width="100%" />
+</p>
+
 
 <br />
 
