@@ -6,6 +6,7 @@ import type { NodeExecutor } from "@/features/executions/types";
 import { openaiChannel } from "@/inngest/channels/openai";
 import prisma from "@/lib/db";
 import { NodeType } from "@/generated/prisma/enums";
+import { decrypt } from "@/lib/ecryption";
 
 Handlebars.registerHelper("json", (context) => {
   const jsonString = JSON.stringify(context, null, 2);
@@ -86,7 +87,7 @@ export const openAiExecutor: NodeExecutor<OpenAiData> = async ({
   }
 
   const openai = createOpenAI({
-    apiKey: credential.value,
+    apiKey: decrypt(credential.value),
   });
 
   try {

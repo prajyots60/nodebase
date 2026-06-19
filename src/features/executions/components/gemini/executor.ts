@@ -6,6 +6,7 @@ import type { NodeExecutor } from "@/features/executions/types";
 import { geminiChannel } from "@/inngest/channels/gemini";
 import prisma from "@/lib/db";
 import { CredentialType } from "@/generated/prisma/enums";
+import { decrypt } from "@/lib/ecryption";
 
 Handlebars.registerHelper("json", (context) => {
   const jsonString = JSON.stringify(context, null, 2);
@@ -88,12 +89,12 @@ export const geminiExecutor: NodeExecutor<GeminiData> = async ({
   }
 
   const google = createGoogleGenerativeAI({
-    apiKey: credential.value,
+    apiKey: decrypt(credential.value), //MORE_TODO: AWS KEY MANAGER -> ROTATION OF KEYS
   });
 
   try {
     const { text } = await step.ai.wrap("gemini-generate-text", generateText, {
-      model: google("gemini-3.5-flash"),
+      model: google("gemini-3.5-flash"), //MORE_TODO: ALLOW USER TO CHOOSE MODEL
       system: systemPrompt,
       prompt: userPrompt,
       experimental_telemetry: {
