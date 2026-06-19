@@ -6,13 +6,7 @@ const nextConfig: NextConfig = {
   compress: true,
   /* config options here */
   async redirects() {
-    return [
-      {
-        source: "/",
-        destination: "/workflows",
-        permanent: false,
-      },
-    ];
+    return [];
   },
 };
 
