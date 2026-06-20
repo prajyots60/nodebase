@@ -228,3 +228,28 @@
   0% { transform: translateX(0%); }
   100% { transform: translateX(-33.33%); }
 }
+
+@keyframes workflow-dash {
+  from {
+    stroke-dashoffset: 200;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.animate-workflow-dash-1 {
+  stroke-dasharray: 10 30;
+  animation: workflow-dash 7s linear infinite;
+}
+
+.animate-workflow-dash-2 {
+  stroke-dasharray: 15 45;
+  animation: workflow-dash 10s linear infinite;
+}
+
+.animate-workflow-dash-3 {
+  stroke-dasharray: 8 25;
+  animation: workflow-dash 6s linear infinite;
+}
+
